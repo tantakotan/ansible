@@ -1,0 +1,39 @@
+---
+
+- hosts: ios
+  gather_facts: no
+  connection: local
+
+  tasks:
+    - name: show version
+      ios_command:
+        commands:
+          - show version
+        provider: "{{ cli }}"
+      register: result
+
+    - name: ios_version
+      set_fact:
+        ios_version : "{{ result.stdout[0] | parse_cli_textfsm('./ntc-templates/templates/cisco_ios_show_version.template') }}"
+
+    - name: ios_version_list
+      with_items:
+        "{{ ios_version }}"
+      debug: var=ios_version
+
+    - name: to_csv
+      template:
+        src: "./tpls.txt"
+        dest: "./unko.csv"
+
+    - name: debug
+      debug: var=ios_version[0].CONFIG_REGISTER
+
+  vars:
+    cli: 
+      host: "{{ inventory_hostname }}" 
+      username: "{{ ansible_user }}"
+      password: "{{ ansible_password }}"
+      authorize: true
+      auth_pass: "{{ cisco_enable_secret }}"
+

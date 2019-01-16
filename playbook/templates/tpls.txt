@@ -1,0 +1,4 @@
+"CONFIG_REGISTER","HOSTNAME"
+{% for r in ios_version %}
+"{{ r.CONFIG_REGISTER }}","{{ r.HOSTNAME }}"
+{% endfor %}
